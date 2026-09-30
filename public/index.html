@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WeatherScope</title>
+
+    <link rel="stylesheet" href="stle.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+
+            <h1>WeatherScope</h1>
+
+            <p>EXPLORE YOUR LOCATION</p>
+        </div>
+
+
+        <div class="search-box">
+
+            <label for="lokasiInput">
+                Cari lokasi
+            </label>
+
+            <div class="input-group">
+
+                <input
+                    type="text"
+                    id="lokasiInput"
+                    placeholder="Contoh: Yogyakarta"
+                >
+
+                <button onclick="cariLokasi()">
+                    Cari Lokasi
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div id="loading">
+            Sedang mencari lokasi...
+        </div>
+
+
+        <div id="error"></div>
+
+
+        <div class="location-card" id="locationCard">
+
+            <div class="card-title">
+                LOCATION DETAILS
+            </div>
+
+            <h2 id="namaLokasi">-</h2>
+
+            <div class="line"></div>
+
+
+            <div class="data-row">
+
+                <span>Negara</span>
+
+                <strong id="negara">-</strong>
+
+            </div>
+
+
+            <div class="data-row">
+
+                <span>Provinsi</span>
+
+                <strong id="provinsi">-</strong>
+
+            </div>
+
+
+            <div class="data-row">
+
+                <span>Kecamatan</span>
+
+                <strong id="kecamatan">-</strong>
+
+            </div>
+
+
+            <div class="data-row">
+
+                <span>Longitude</span>
+
+                <strong id="longitude">-</strong>
+
+            </div>
+
+
+            <div class="data-row">
+
+                <span>Latitude</span>
+
+                <strong id="latitude">-</strong>
+
+            </div>
+
+        </div>
+
+
+        <p class="footer">
+            Data lokasi diperoleh dari MapTiler API
+        </p>
+
+    </div>
+
+
+    <script>
+
+        async function cariLokasi() {
+
+            const lokasi =
+                document.getElementById('lokasiInput').value.trim();
+
+            const card =
+                document.getElementById('locationCard');
+
+            const loading =
+                document.getElementById('loading');
+
+            const error =
+                document.getElementById('error');
+
+
+            if (!lokasi) {
+
+                error.textContent =
+                    'Silakan masukkan lokasi terlebih dahulu';
+
+                error.style.display = 'block';
+
+                return;
+            }
+
+
+            loading.style.display = 'block';
+
+            error.style.display = 'none';
+
+            card.style.display = 'none';
+
+
+            try {
+
+                const response = await fetch(
+                    `/api/lokasi?kota=${encodeURIComponent(lokasi)}`
+                );
+
+
+                const data = await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(data.message);
+
+                }
+
+
+                document.getElementById('namaLokasi')
+                    .textContent = data.lokasi;
+
+
+                document.getElementById('negara')
+                    .textContent = data.negara;
+
+
+                document.getElementById('provinsi')
+                    .textContent = data.provinsi;
+
+
+                document.getElementById('kecamatan')
+                    .textContent = data.kecamatan;
+
+
+                document.getElementById('longitude')
+                    .textContent = data.longitude;
+
+
+                document.getElementById('latitude')
+                    .textContent = data.latitude;
+
+
+                card.style.display = 'block';
+
+
+            } catch (err) {
+
+                error.textContent = err.message;
+
+                error.style.display = 'block';
+
+            } finally {
+
+                loading.style.display = 'none';
+
+            }
+
+        }
+
+
+        document
+            .getElementById('lokasiInput')
+            .addEventListener('keydown', function(event) {
+
+                if (event.key === 'Enter') {
+
+                    cariLokasi();
+
+                }
+
+            });
+
+    </script>
+
+</body>
+
+</html>
